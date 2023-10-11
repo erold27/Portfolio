@@ -137,7 +137,8 @@ where
   ,'Brulure'
  )
 
- -- For all OBGYN change gender is male
+
+ -- For all OBGYN  gender is male change them to female
  update Backup_Data_manupilation
 set Sexe_de_la_victime = 'Femme'
 where 
@@ -172,7 +173,7 @@ and N_de_fiche in(
 '20230910-0008'
 )
 
--- for all obgyn change sex is Inconnu to femme
+-- for all obgyn change gender Inconnu to female
 
 update Backup_Data_manupilation
 set Sexe_de_la_victime = 'Femme'
@@ -192,7 +193,7 @@ group by Type_d_appel
 
 --Number of non-noisy calls
 Select Type_d_appel,  count(Type_d_appel) as NumberOfNonNoisyCalls  from Backup_Data_manupilation
-where Type_d_appel <>'Nuisible' and Type_d_appel<>'Info' and mois =9
+where Type_d_appel <>'Nuisible' and Type_d_appel<>'Info'
 group by Type_d_appel
 
 
@@ -203,7 +204,7 @@ group by Type_d_appel
 
 -- Gender distribution of patients
 Select Sexe_de_la_victime,  count(Type_d_appel) as NumberOfSexPerPatient from Backup_Data_manupilation
-where Type_d_appel ='Urgence' and Mois =9
+where Type_d_appel ='Urgence'
 group by Sexe_de_la_victime
 
 
@@ -280,105 +281,49 @@ group by Raison_de_l_appel
 
 
 
--- Hourly call distribution
-Select Type_d_appel, Heure from Backup_Data_manupilation
-group by Type_d_appel, Heure
-
-
--- Hourly call distribution 
-Select Heure, count(Heure) from Backup_Data_manupilation
---where Type_d_appel='Urgence'
-group by  Heure
-
 -- Hourly call distribution urgence
---Select Heure, count(Heure) as qteAppelUrgence from Backup_Data_manupilation
---where Type_d_appel='Urgence'
---group by  Heure
-
--- Hourly call distribution urgence
-Select Heure, count(Type_d_appel) as qteAppelUrgence from Backup_Data_manupilation
+Select Heure, count(Type_d_appel) as qteAppelUrgenceParHeure from Backup_Data_manupilation
 where Type_d_appel='Urgence'
 group by  Heure
 
 
-
--- Weekly call distribution urgence
-Select Mois, count(Type_d_appel) as qteAppelUrgence from Backup_Data_manupilation
+-- Monthly call distribution urgence
+Select Mois, count(Type_d_appel) as qteAppelUrgenceParMois from Backup_Data_manupilation
 where Type_d_appel='Urgence'
 group by  Mois
 order by Mois asc
 
 
 -- yaerly call distribution urgence in AM
-Select heure, count(Type_d_appel) as qteAppelUrgence from Backup_Data_manupilation
-where Type_d_appel='Urgence' and Heure between 0 and 12
+Select heure, count(Type_d_appel) as qteAppelUrgenceApresMartin from Backup_Data_manupilation
+where Type_d_appel='Urgence' and Heure between 0 and 11
 group by  heure
-order by qteAppelUrgence desc
+order by qteAppelUrgenceApresMartin desc
 
--- yaerly call distribution urgence in PM
-
-Select heure, count(Type_d_appel) as qteAppelUrgence from Backup_Data_manupilation
-where Type_d_appel='Urgence' and Heure between 13 and 23
+-- yearly call distribution urgence in PM
+Select heure, count(Type_d_appel) as qteAppelUrgenceApresMidi from Backup_Data_manupilation
+where Type_d_appel='Urgence' and Heure between 12 and 23
 group by  heure
-order by qteAppelUrgence desc
+order by qteAppelUrgenceApresMidi desc
 
 
 -- Weekly Noisy call distribution 
-Select Heure, count(Type_d_appel) as qteAppelUrgence from Backup_Data_manupilation
+Select Heure, count(Type_d_appel) as qteAppelUrgenceNuisible from Backup_Data_manupilation
 where Type_d_appel='Nuisible'
 group by  Heure
-order by Heure desc ,qteAppelUrgence desc
-
+order by Heure desc ,qteAppelUrgenceNuisible desc
 
 
 -- weekly call distribution for urgence
---Select  Age_de_la_victime, count(Type_d_appel) AS QtAppelNuisible from Backup_Data_manupilation
---where Type_d_appel='Nuisible'
---group by  Age_de_la_victime
---order by QtAppelNuisible desc 
-
-
-
-Select  semaine, count(Type_d_appel) AS qtWeek from Backup_Data_manupilation
+Select  semaine, count(Type_d_appel) AS qtAppelUrgenceParSemaine from Backup_Data_manupilation
 where Type_d_appel='Urgence'
 group by  semaine, Type_d_appel
-order by qtWeek desc 
-
-
---Select count(Type_d_appel) as qte_femmeAdult from Backup_Data_manupilation
---where Type_d_appel  ='Urgence'
---and (Sexe_de_la_victime='Homme' and Age_de_la_victime>='16-25 ans'
---and Age_de_la_victime<>'6-15 ans' and Age_de_la_victime<>'Non specifie' )
---group by Age_de_la_victime,Raison_de_l_appel
+order by qtAppelUrgenceParSemaine desc 
 
 
 
 
---Lets copy this d to a backup one
-
-
---select * into backup_manipulation2
---from Backup_Data_manupilation
-
-
---select Département_de_localisation, type_d_appel,
-
-
---CASE
---    WHEN Département_de_localisation like '(01)%' THEN 'Ouest'
---    WHEN Département_de_localisation like'(07)%' THEN 'Sud'
---    WHEN Département_de_localisation like '(05)%' THEN 'Artibonite'
---	WHEN Département_de_localisation like'(03)%' THEN 'Nord'
---    WHEN Département_de_localisation like '(04)%' THEN 'Nord-Est'
---	WHEN Département_de_localisation like '(09)%' THEN 'Nord-Ouest'
---	WHEN Département_de_localisation like '(02)%' THEN 'Sud-Est'
---	WHEN Département_de_localisation like'(06)%' THEN 'Centre'
---	WHEN Département_de_localisation like '(10)%' THEN 'Nippes'
---	WHEN Département_de_localisation like '(08)%' THEN 'Grand-Anse'
---    ELSE NULL
---END
---from sql_data_manipulation_portfolio 
 
 
 
-select Date_urgence , DATENAME(HOUR, Date_urgence) from oeust_portfolio
+
